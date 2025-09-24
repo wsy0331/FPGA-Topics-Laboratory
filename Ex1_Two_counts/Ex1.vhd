@@ -29,15 +29,15 @@ begin
         elsif i_clk'event and i_clk = '1' then
             case state is
                 when S0 =>
-                    if count1 = "00001001" then
+                    if count1 = "00001000" then
                         state <= S1;
                     end if;
                 when S1 =>
-                    if count2 = "01001111" then
+                    if count2 = "01010000" then
                         state <= S2;
                     end if;
                 when S2 =>
-                    if count3 = "00011110" then
+                    if count3 = "00011101" then
                         state <= S0;
                     end if;
                 when others =>
