@@ -7,3 +7,15 @@
 模擬結果：
 <img width="1280" height="254" alt="image" src="https://github.com/user-attachments/assets/502df058-e9a7-4e8c-b731-92d94327c5bf" />
 <img width="1280" height="222" alt="image" src="https://github.com/user-attachments/assets/7b882770-ba41-412a-9f32-5ab0f8f2292b" />
+
+# Ex2 TwoBreath
+兩顆LED進行交互呼吸
+模擬結果：
+<img width="1298" height="294" alt="image" src="https://github.com/user-attachments/assets/9eadebe2-5abd-4a92-a731-4f4e773ac323" />
+
+結果影片：
+https://github.com/user-attachments/assets/281d574f-baf1-4928-93f6-fe4d468e573e
+
+
+
+
