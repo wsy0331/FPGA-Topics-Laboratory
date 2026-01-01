@@ -47,24 +47,24 @@ begin
                     elsif i_swL = '0' and i_swR = '1' then  
                         state <= MovingL;
                     end if;
-                when MovingR => 
+                when MovingR => --右移中
                     if (led_r<"00000001") or (led_r > "00000001" and i_swR = '1') then 
                         state <= Lwin;
-                    elsif led_r(0)='1' and i_swR ='1' then 
+                    elsif led_r(0)='1' and i_swR ='1' then --右邊打到
                         state <= MovingL;                     
                     end if;
-                when MovingL =>
+                when MovingL => --左移中
                     if (led_r="00000000") or (led_r < "10000000" and i_swL = '1') then
                         state <= Rwin;
-                    elsif led_r(7)='1' and i_swL ='1' then
+                    elsif led_r(7)='1' and i_swL ='1' then --左邊打到
                         state <= MovingR;                                          
                     end if;
                 when Lwin =>
-                    if i_swL ='1' then
+                    if i_swL ='1' then --左邊發球
                         state <= MovingR;
                     end if;
                 when Rwin =>
-                    if i_swR ='1' then
+                    if i_swR ='1' then --右邊發球
                         state <= MovingL;
                     end if;
                 when others => 
@@ -73,11 +73,11 @@ begin
         end if;
     end process;
 
-    Older_state: process(i_clk, i_rst)
+    Older_state: process(slow_clk, i_rst)
     begin
         if i_rst='0' then
             old_state <= IDLE;
-        elsif i_clk'event and i_clk='1' then
+        elsif slow_clk'event and slow_clk='1' then
             old_state <= state;            
         end if;
     end process;
@@ -116,11 +116,11 @@ begin
         end if;
     end process;
 
-    score_L_p:process(i_clk, i_rst)
+    score_L_p:process(slow_clk, i_rst)
     begin
         if i_rst='0' then
             scoreL <= "0000";
-        elsif i_clk'event and i_clk='1' then
+        elsif slow_clk'event and slow_clk='1' then
             if state = Lwin and old_state /= Lwin then 
                 if scoreL = "1111" then 
                     scoreL <= "0000";
@@ -131,11 +131,11 @@ begin
         end if;
     end process;
 
-    score_R_p:process(i_clk, i_rst)
+    score_R_p:process(slow_clk, i_rst)
     begin
         if i_rst='0' then
             scoreR <= "0000";
-        elsif i_clk'event and i_clk='1' then
+        elsif slow_clk'event and slow_clk='1' then
             if state = Rwin and old_state /= Rwin then  
                 if scoreR = "1111" then 
                     scoreR <= "0000";
