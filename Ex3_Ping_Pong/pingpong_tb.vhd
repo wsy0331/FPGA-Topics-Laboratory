@@ -40,7 +40,7 @@ begin
     
     stim_proc: process
     begin
-        -- 初始化 Reset
+        -- Reset
         reset <= '0';
         swL <= '0';
         swR <= '0';
@@ -48,72 +48,65 @@ begin
         reset <= '1';
         wait for 100 ns;
         
-        -- Test 1: 右方發球
+        -- 1.正常對打，右方先發球
         swR <= '1';
         wait for 40 ns;
         swR <= '0';
-        wait for 100 ns;
-        
-        -- Test 2: 正常對打 - 左方正常回擊
-        wait for 460 ns;
+        wait for 560 ns;
         swL <= '1';
         wait for 40 ns;
         swL <= '0';
-        wait for 100 ns;
-        
-        -- Test 3: 左邊沒打到右邊得分
-        wait for 460 ns;
+        wait for 560 ns;
         swR <= '1';
         wait for 40 ns;
         swR <= '0';
-        wait for 100 ns;
+
         
-        -- Test 4: 右方提前打 正在右移，且左邊沒打到右邊得分
-        swR <= '1';
-        wait for 40 ns;
-        swR <= '0';
-        wait for 100 ns;
-        
-        -- Test 5: 右方發球
-        wait for 580 ns;
-        swR <= '1';
-        wait for 40 ns;
-        swR <= '0';
-        wait for 100 ns;
-        
-        -- Test 6: 右邊沒打到左邊得分
-        wait for 860 ns;
+        -- 2.左方晚打，右方得分
+        wait for 600 ns;
         swL <= '1';
         wait for 40 ns;
         swL <= '0';
-        wait for 100 ns;   
         
---        --左邊提前打
---        swL <= '1';
---        wait for 40 ns;
---        swL <= '0';
---        wait for 100 ns;
+        -- 3.右方發球
+        wait for 220 ns;
+        swR <= '1';
+        wait for 40 ns;
+        swR <= '0';
+        
+        -- 4.左邊回擊，右邊晚打，左邊得分
+        wait for 620 ns;
+        swL <= '1';
+        wait for 40 ns;
+        swL <= '0';
+        wait for 600 ns;
+        swR <= '1';
+        wait for 40 ns;
+        swR <= '0';  
+        
+        --5.左邊發球，右邊漏接，左邊得分
+        wait for 400 ns;
+        swL <= '1';
+        wait for 40 ns;
+        swL <= '0';
+        
+        --6.右邊漏接，左邊得分
+        wait for 1000 ns;
+        swL <= '1';
+        wait for 40 ns;
+        swL <= '0';
+        wait for 600 ns;
+        swR <= '1';
+        wait for 40 ns;
+        swR <= '0';
+        wait for 100 ns;
         
 --        --左邊發球
---        wait for 460 ns;
+--        wait for 360 ns;
 --        swL <= '1';
 --        wait for 40 ns;
 --        swL <= '0';
 --        wait for 100 ns;
-        
-        --右邊提早打
-        wait for 150 ns;
-        swR <= '1';
-        wait for 40 ns;
-        swR <= '0';
-        wait for 100 ns;
-        
-        --左邊發球
-        wait for 360 ns;
-        swL <= '1';
-        wait for 40 ns;
-        swL <= '0';
-        wait for 100 ns;
         
         wait;
     end process;
