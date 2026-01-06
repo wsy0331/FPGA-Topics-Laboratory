@@ -1,0 +1,37 @@
+set_property IOSTANDARD LVCMOS25 [get_ports i_clk]
+set_property PACKAGE_PIN Y9 [get_ports i_clk]
+
+set_property -dict {PACKAGE_PIN F22  IOSTANDARD LVCMOS25}  [get_ports {i_rst}]
+set_property -dict {PACKAGE_PIN V4   IOSTANDARD LVCMOS25}  [get_ports {o_h_sync}]
+set_property -dict {PACKAGE_PIN U6   IOSTANDARD LVCMOS25}  [get_ports {o_v_sync}]
+
+set_property -dict {PACKAGE_PIN G22 IOSTANDARD LVCMOS25} [get_ports {i_swR}]
+set_property -dict {PACKAGE_PIN M15 IOSTANDARD LVCMOS25} [get_ports {i_swL}]
+set_property -dict {PACKAGE_PIN N15 IOSTANDARD LVCMOS25} [get_ports {i_btR}]
+set_property -dict {PACKAGE_PIN R18 IOSTANDARD LVCMOS25} [get_ports {i_btL}]
+
+
+set_property -dict {PACKAGE_PIN AB11 IOSTANDARD LVCMOS25} [get_ports {o_red[3]}]
+set_property -dict {PACKAGE_PIN U4 IOSTANDARD LVCMOS25} [get_ports {o_red[2]}]
+set_property -dict {PACKAGE_PIN T6 IOSTANDARD LVCMOS25} [get_ports {o_red[1]}]
+set_property -dict {PACKAGE_PIN R6 IOSTANDARD LVCMOS25} [get_ports {o_red[0]}]
+
+set_property -dict {PACKAGE_PIN AB5 IOSTANDARD LVCMOS25} [get_ports {o_green[3]}]
+set_property -dict {PACKAGE_PIN AB1 IOSTANDARD LVCMOS25} [get_ports {o_green[2]}]
+set_property -dict {PACKAGE_PIN AB2 IOSTANDARD LVCMOS25} [get_ports {o_green[1]}]
+set_property -dict {PACKAGE_PIN AA7 IOSTANDARD LVCMOS25} [get_ports {o_green[0]}]
+
+set_property -dict {PACKAGE_PIN V5 IOSTANDARD LVCMOS25} [get_ports {o_blue[3]}]
+set_property -dict {PACKAGE_PIN T4 IOSTANDARD LVCMOS25} [get_ports {o_blue[2]}]
+set_property -dict {PACKAGE_PIN AB7 IOSTANDARD LVCMOS25} [get_ports {o_blue[1]}]
+set_property -dict {PACKAGE_PIN AB4 IOSTANDARD LVCMOS25} [get_ports {o_blue[0]}]
+
+
+set_property -dict {PACKAGE_PIN T22 IOSTANDARD LVCMOS25} [get_ports {o_led[0]}]
+set_property -dict {PACKAGE_PIN T21 IOSTANDARD LVCMOS25} [get_ports {o_led[1]}]
+set_property -dict {PACKAGE_PIN U22 IOSTANDARD LVCMOS25} [get_ports {o_led[2]}]
+set_property -dict {PACKAGE_PIN U21 IOSTANDARD LVCMOS25} [get_ports {o_led[3]}]
+set_property -dict {PACKAGE_PIN V22 IOSTANDARD LVCMOS25} [get_ports {o_led[4]}]
+set_property -dict {PACKAGE_PIN W22 IOSTANDARD LVCMOS25} [get_ports {o_led[5]}]
+set_property -dict {PACKAGE_PIN U19 IOSTANDARD LVCMOS25} [get_ports {o_led[6]}]
+set_property -dict {PACKAGE_PIN U14 IOSTANDARD LVCMOS25} [get_ports {o_led[7]}]
