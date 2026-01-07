@@ -23,7 +23,7 @@ architecture Behavioral of pingpong is
 begin
 
     o_led <= led_r;
-    slow_clk <= clk_div(1);  
+    slow_clk <= clk_div(23);  
     
     Div_clk:process(i_clk, i_rst)
     begin
@@ -40,31 +40,30 @@ begin
             state <= IDLE;
         elsif i_clk'event and i_clk='1' then
             case state is
-                
                 when IDLE =>
                     if i_swL = '1' and i_swR = '0' then 
                         state <= MovingR;
                     elsif i_swL = '0' and i_swR = '1' then  
                         state <= MovingL;
                     end if;
-                when MovingR => --¥k²¾¤¤
+                when MovingR => --å³ç§»ä¸­
                     if (led_r<"00000001") or (led_r > "00000001" and i_swR = '1') then 
                         state <= Lwin;
-                    elsif led_r(0)='1' and i_swR ='1' then --¥kÃä¥´¨ì
+                    elsif led_r(0)='1' and i_swR ='1' then --å³é‚Šæ‰“åˆ°
                         state <= MovingL;                     
                     end if;
-                when MovingL => --¥ª²¾¤¤
+                when MovingL => --å·¦ç§»ä¸­
                     if (led_r="00000000") or (led_r < "10000000" and i_swL = '1') then
                         state <= Rwin;
-                    elsif led_r(7)='1' and i_swL ='1' then --¥ªÃä¥´¨ì
+                    elsif led_r(7)='1' and i_swL ='1' then --å·¦é‚Šæ‰“åˆ°
                         state <= MovingR;                                          
                     end if;
                 when Lwin =>
-                    if i_swL ='1' then --¥ªÃäµo²y
+                    if i_swL ='1' then --å·¦é‚Šç™¼çƒ
                         state <= MovingR;
                     end if;
                 when Rwin =>
-                    if i_swR ='1' then --¥kÃäµo²y
+                    if i_swR ='1' then --å³é‚Šç™¼çƒ
                         state <= MovingL;
                     end if;
                 when others => 
@@ -89,7 +88,11 @@ begin
         elsif slow_clk'event and slow_clk = '1' then
             case state is
                 when IDLE =>
-                    led_r <= "00000000"; 
+                    if i_swL = '1' and i_swR = '0' then 
+                        led_r <= "10000000";
+                    elsif i_swL = '0' and i_swR = '1' then  
+                        led_r <= "00000001";
+                    end if;
                 when MovingR =>
                    if old_state = Lwin or old_state = IDLE then
                         led_r <= "10000000"; 
