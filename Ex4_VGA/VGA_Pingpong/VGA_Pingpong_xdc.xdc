@@ -7,8 +7,8 @@ set_property -dict {PACKAGE_PIN U6   IOSTANDARD LVCMOS25}  [get_ports {o_v_sync}
 
 set_property -dict {PACKAGE_PIN G22 IOSTANDARD LVCMOS25} [get_ports {i_swR}]
 set_property -dict {PACKAGE_PIN M15 IOSTANDARD LVCMOS25} [get_ports {i_swL}]
-set_property -dict {PACKAGE_PIN N15 IOSTANDARD LVCMOS25} [get_ports {i_btR}]
-set_property -dict {PACKAGE_PIN R18 IOSTANDARD LVCMOS25} [get_ports {i_btL}]
+set_property -dict {PACKAGE_PIN R16 IOSTANDARD LVCMOS25} [get_ports {i_btR}]
+set_property -dict {PACKAGE_PIN T18 IOSTANDARD LVCMOS25} [get_ports {i_btL}]
 
 
 set_property -dict {PACKAGE_PIN AB11 IOSTANDARD LVCMOS25} [get_ports {o_red[3]}]
