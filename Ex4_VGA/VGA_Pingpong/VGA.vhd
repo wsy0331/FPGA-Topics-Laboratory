@@ -4,7 +4,7 @@ use IEEE.numeric_std.ALL;
 
 entity VGA is
     generic(
-        -- 800x600@60Hz SVGA ∞—º∆ (40 MHz pixel clock)
+        -- 800x600@60Hz SVGA ÂèÉÊï∏ (40 MHz pixel clock)
         H_RES   : integer   := 800;
         H_FP    : integer   := 40;
         H_SYNC  : integer   := 128;
@@ -40,15 +40,15 @@ end VGA;
 
 architecture rtl of VGA is
 
-    -- §ﬁ•Œ pingpong §∏•Û
+    -- ÂºïÁî® pingpong ÂÖÉ‰ª∂
     component pingpong is
         Port (
             i_clk : in STD_LOGIC;
             i_rst : in STD_LOGIC;  -- active-low
             i_btL : in STD_LOGIC;
             i_btR : in STD_LOGIC;
-            i_swL : in STD_LOGIC;
-            i_swR : in STD_LOGIC;
+            i_swL : in STD_LOGIC;  -- Â∑¶ÈÇäÈÄüÂ∫¶ÈÅ∏ÊìáÔºö1=Âø´Ôºå0=ÊÖ¢
+            i_swR : in STD_LOGIC;  -- Âè≥ÈÇäÈÄüÂ∫¶ÈÅ∏ÊìáÔºö1=Âø´Ôºå0=ÊÖ¢
             o_led : out STD_LOGIC_VECTOR (7 downto 0)
         );
     end component;
@@ -81,8 +81,9 @@ begin
     -- Reset Logic: Assuming i_rst is Active-High (1=Reset), 
     -- but pingpong expects Active-Low (0=Reset).
     pp_rst_n <= not i_rst;
-
-    -- πÍ®“§∆ Ping Pong πC¿∏Æ÷§ﬂ
+    o_led <= led_status;
+    
+    -- ÂØ¶‰æãÂåñ Ping Pong ÈÅäÊà≤Ê†∏ÂøÉ
     inst_pingpong: pingpong
     port map (
         i_clk => i_clk,
@@ -173,7 +174,7 @@ begin
         variable rad2       : integer := LED_RADIUS * LED_RADIUS;
         
         variable center_x   : integer;
-        variable led_idx    : integer; -- 0 to 6
+        variable led_idx    : integer; -- 0 to 7
         variable is_led_on  : boolean;
         variable hit_circle : boolean;
         variable current_bit: std_logic;
@@ -184,7 +185,7 @@ begin
                 o_green <= (others => '0');
                 o_blue  <= (others => '0');
             elsif pix_ce = '1' then
-                -- πw≥]≠I¥∫¶‚ (≤`¬≈¶‚)
+                -- È†êË®≠ËÉåÊôØËâ≤ (Ê∑±ËóçËâ≤)
                 o_red   <= "0000";
                 o_green <= "0000";
                 o_blue  <= "0010"; 
@@ -193,15 +194,15 @@ begin
                     hit_circle := false;
                     is_led_on  := false;
                     
-                    -- ¿u§∆°G•˝¿À¨d Y ∂b¨Oß_¶b∂ÍßŒΩd≥Ú§∫°A¥Ó§÷≠p∫‚∂q
+                    -- ÂÑ™ÂåñÔºöÂÖàÊ™¢Êü• Y Ëª∏ÊòØÂê¶Âú®ÂúìÂΩ¢ÁØÑÂúçÂÖßÔºåÊ∏õÂ∞ëË®àÁÆóÈáè
                     if abs(v_count - LED_Y) <= LED_RADIUS then
                         
-                        -- ¿À¨d 7 ≠” LED ™∫¶Ï∏m
-                        -- ß⁄≠Ã∞≤≥] LED ±q•™®Ï•k πÔ¿≥ led_status(6) ®Ï led_status(0)
-                        for k in 0 to 6 loop
+                        -- Ê™¢Êü• 7 ÂÄã LED ÁöÑ‰ΩçÁΩÆ
+                        -- ÊàëÂÄëÂÅáË®≠ LED ÂæûÂ∑¶Âà∞Âè≥ Â∞çÊáâ led_status(7) Âà∞ led_status(0)
+                        for k in 0 to 7 loop
                             center_x := LED_START_X + k * LED_GAP;
                             
-                            -- ¿À¨d X ∂bΩd≥Ú (BBox check)
+                            -- Ê™¢Êü• X Ëª∏ÁØÑÂúç (BBox check)
                             if abs(h_count - center_x) <= LED_RADIUS then
                                 dx := h_count - center_x;
                                 dy := v_count - LED_Y;
@@ -210,8 +211,8 @@ begin
                                 if dist2 <= rad2 then
                                     hit_circle := true;
                                     
-                                    -- πÔ¿≥ logic vector: ø√πı•™√‰(k=0)πÔ¿≥ Bit 6
-                                    current_bit := led_status(6 - k);  -- Æ⁄æ⁄ led_status ßP¬_¨Oß_≈„•‹∏”¡˚≤y
+                                    -- Â∞çÊáâ logic vector: Ëû¢ÂπïÂ∑¶ÈÇä(k=0)Â∞çÊáâ Bit 7
+                                    current_bit := led_status(7 - k);  -- Ê†πÊìö led_status Âà§Êñ∑ÊòØÂê¶È°ØÁ§∫Ë©≤È°ÜÁêÉ
                                     
                                     if current_bit = '1' then
                                         is_led_on := true;
@@ -219,59 +220,64 @@ begin
                                         is_led_on := false;
                                     end if;
                                     
-                                    -- Æ⁄æ⁄ led_status ≥]©w√C¶‚
+                                    -- Ê†πÊìö led_status Ë®≠ÂÆöÈ°èËâ≤
                                     if is_led_on then
-                                        -- Æ⁄æ⁄ led_status ≈„•‹§£¶P√C¶‚
+                                        -- Ê†πÊìö led_status È°ØÁ§∫‰∏çÂêåÈ°èËâ≤
                                         case k is
                                             when 0 =>
-                                                -- √C¶‚≥]©w 1 (®“¶p¨ı¶‚)
+                                                
                                                 o_red   <= "1111";
                                                 o_green <= "0000";
                                                 o_blue  <= "0000";  -- Red
                                             when 1 =>
-                                                -- √C¶‚≥]©w 2 (®“¶p∫Ò¶‚)
+                                                
                                                 o_red   <= "0000";
                                                 o_green <= "1111";
                                                 o_blue  <= "0000";  -- Green
                                             when 2 =>
-                                                -- √C¶‚≥]©w 3 (®“¶p¬≈¶‚)
+                                                
                                                 o_red   <= "0000";
                                                 o_green <= "0000";
                                                 o_blue  <= "1111";  -- Blue
                                             when 3 =>
-                                                -- √C¶‚≥]©w 4 (®“¶p∂¿¶‚)
+                                                
                                                 o_red   <= "1111";
                                                 o_green <= "1111";
                                                 o_blue  <= "0000";  -- Yellow
                                             when 4 =>
-                                                -- √C¶‚≥]©w 5 (®“¶pµµ¶‚)
+                                                
                                                 o_red   <= "1111";
                                                 o_green <= "0000";
                                                 o_blue  <= "1111";  -- Purple
                                             when 5 =>
-                                                -- √C¶‚≥]©w 6 (®“¶p´C¶‚)
+                                                
                                                 o_red   <= "0000";
                                                 o_green <= "1111";
                                                 o_blue  <= "1111";  -- Cyan
                                             when 6 =>
-                                                -- √C¶‚≥]©w 7 (®“¶p•’¶‚)
+                                                
                                                 o_red   <= "1111";
                                                 o_green <= "1111";
                                                 o_blue  <= "1111";  -- White
+                                            when 7 =>
+                                                
+                                                o_red   <= "1010";
+                                                o_green <= "1010";
+                                                o_blue  <= "1010";  -- White
                                             when others =>
-                                                -- ®‰•L√C¶‚ (∂¬¶‚©Œ√ˆ≥¨)
+                                                
                                                 o_red   <= "0000";
                                                 o_green <= "0000";
                                                 o_blue  <= "0000";  -- Black or Off
                                         end case;
                                     else
-                                        -- ¶p™G∏”¡˚ LED ®S¶≥≥Q∂}±“°A´h≈„•‹≠I¥∫√C¶‚
+                                        -- Â¶ÇÊûúË©≤È°Ü LED Ê≤íÊúâË¢´ÈñãÂïüÔºåÂâáÈ°ØÁ§∫ËÉåÊôØÈ°èËâ≤
                                         o_red   <= "0010";
                                         o_green <= "0010";
                                         o_blue  <= "0010";  -- Background (Blue)
                                     end if;
                                     
-                                    -- ß‰®Ï§@≠”∂Í¥N§£•Œƒ~ƒÚ¿À¨d®‰•L™∫§F (¶]¨∞∂Í§£≠´≈|)
+                                    -- ÊâæÂà∞‰∏ÄÂÄãÂúìÂ∞±‰∏çÁî®ÁπºÁ∫åÊ™¢Êü•ÂÖ∂‰ªñÁöÑ‰∫Ü (Âõ†ÁÇ∫Âúì‰∏çÈáçÁñä)
                                     exit; 
                                 end if;
                             end if;
@@ -279,7 +285,7 @@ begin
                         
                     end if; -- Y check
                 else
-                    -- Blanking Interval (∂¬µe≠±)
+                    -- Blanking Interval (?Œºe??)
                     o_red   <= (others => '0');
                     o_green <= (others => '0');
                     o_blue  <= (others => '0');
