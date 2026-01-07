@@ -6,36 +6,34 @@ entity pingpong is
     Port (
         i_clk : in STD_LOGIC;
         i_rst : in STD_LOGIC;  -- active-low
-        i_btL : in STD_LOGIC;  -- ¥ªÃä«öÁä¡]À»²y/µo²y¡^
-        i_btR : in STD_LOGIC;  -- ¥kÃä«öÁä¡]À»²y/µo²y¡^
-        i_swL : in STD_LOGIC;  -- ¥ªÃä³t«×¿ï¾Ü¡G1=§Ö¡A0=ºC
-        i_swR : in STD_LOGIC;  -- ¥kÃä³t«×¿ï¾Ü¡G1=§Ö¡A0=ºC
+        i_btL : in STD_LOGIC;  
+        i_btR : in STD_LOGIC;  
+        i_swL : in STD_LOGIC;  
+        i_swR : in STD_LOGIC;  
         o_led : out STD_LOGIC_VECTOR (7 downto 0)
     );
 end pingpong;
 
 architecture Behavioral of pingpong is
-    -- ª¬ºA
     type STATE_TYPE is (MovingL, MovingR, Lwin, Rwin);
     signal state      : STATE_TYPE := MovingR;
     signal prev_state : STATE_TYPE := MovingR;
     signal led_r  : STD_LOGIC_VECTOR (7 downto 0) := "10000000";
     signal scoreL : STD_LOGIC_VECTOR (3 downto 0) := "0000";
     signal scoreR : STD_LOGIC_VECTOR (3 downto 0) := "0000";
-    signal L : std_logic := '0';
-    signal R : std_logic := '0';
-    signal clk_div : unsigned(28 downto 0) := (others => '0');
+    signal clk_div : unsigned(23 downto 0) := (others => '0');
     signal ball : std_logic := '1';
-    signal btL_meta, btL_sync, btL_prev, btL_rise : std_logic := '0'; -- sync ¨¾¼u¸õ  prev  «e­Óª¬ºA     rise  Á×§Kªø«ö³sÄòµo²y  
+    
+    -- Button sync signals
+    signal btL_meta, btL_sync, btL_prev, btL_rise : std_logic := '0';
     signal btR_meta, btR_sync, btR_prev, btR_rise : std_logic := '0';
     signal swL_meta, swL_sync : std_logic := '0';
     signal swR_meta, swR_sync : std_logic := '0';
-    signal earlyL : std_logic := '0';
-    signal earlyR : std_logic := '0';
+    
     signal ball_tick      : std_logic;
     signal ball_tick_edge : std_logic := '0';
-    constant FAST_BIT : integer := 23;  
-    constant SLOW_BIT : integer := 25;
+    constant FAST_BIT : integer := 22;  
+    constant SLOW_BIT : integer := 23;
     signal at_left_end  : std_logic;
     signal at_right_end : std_logic;
 
@@ -44,6 +42,7 @@ begin
     at_left_end  <= '1' when led_r = "10000000" else '0';
     at_right_end <= '1' when led_r = "00000001" else '0';
 
+    -- Clock Divider
     process(i_clk, i_rst)
     begin
         if i_rst = '0' then
@@ -55,7 +54,8 @@ begin
 
     ball_tick <= std_logic(clk_div(FAST_BIT)) when ball='0' else std_logic(clk_div(SLOW_BIT));
 
- ball_tic: process(i_clk, i_rst)
+    -- Edge detection for ball tick
+    ball_tic: process(i_clk, i_rst)
         variable prev : std_logic := '0';
     begin
         if i_rst='0' then
@@ -71,136 +71,48 @@ begin
         end if;
     end process;
 
-
-  btL_met:  process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            btL_meta <= '0';
-        elsif rising_edge(i_clk) then
-            btL_meta <= i_btL;
-        end if;
-    end process;
-
-   btL_syn: process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            btL_sync <= '0';
-        elsif rising_edge(i_clk) then
-            btL_sync <= btL_meta;
-        end if;
-    end process;
-
+    -- Button L Sync
     process(i_clk, i_rst)
     begin
-        if i_rst='0' then
-            btL_prev <= '0';
+        if i_rst='0' then btL_meta <= '0'; btL_sync <= '0'; btL_prev <= '0';
         elsif rising_edge(i_clk) then
+            btL_meta <= i_btL;
+            btL_sync <= btL_meta;
             btL_prev <= btL_sync;
         end if;
     end process;
-
     btL_rise <= '1' when (btL_sync='1' and btL_prev='0') else '0';
 
+    -- Button R Sync
     process(i_clk, i_rst)
     begin
-        if i_rst='0' then
-            btR_meta <= '0';
+        if i_rst='0' then btR_meta <= '0'; btR_sync <= '0'; btR_prev <= '0';
         elsif rising_edge(i_clk) then
             btR_meta <= i_btR;
-        end if;
-    end process;
-
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            btR_sync <= '0';
-        elsif rising_edge(i_clk) then
             btR_sync <= btR_meta;
-        end if;
-    end process;
-
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            btR_prev <= '0';
-        elsif rising_edge(i_clk) then
             btR_prev <= btR_sync;
         end if;
     end process;
-
     btR_rise <= '1' when (btR_sync='1' and btR_prev='0') else '0';
 
+    -- Switches Sync
     process(i_clk, i_rst)
     begin
-        if i_rst='0' then
-            swL_meta <= '0';
+        if i_rst='0' then swL_meta <= '0'; swL_sync <= '0';
         elsif rising_edge(i_clk) then
-            swL_meta <= i_swL;
+            swL_meta <= i_swL; swL_sync <= swL_meta;
         end if;
     end process;
 
     process(i_clk, i_rst)
     begin
-        if i_rst='0' then
-            swL_sync <= '0';
+        if i_rst='0' then swR_meta <= '0'; swR_sync <= '0';
         elsif rising_edge(i_clk) then
-            swL_sync <= swL_meta;
+            swR_meta <= i_swR; swR_sync <= swR_meta;
         end if;
     end process;
 
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            swR_meta <= '0';
-        elsif rising_edge(i_clk) then
-            swR_meta <= i_swR;
-        end if;
-    end process;
-
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            swR_sync <= '0';
-        elsif rising_edge(i_clk) then
-            swR_sync <= swR_meta;
-        end if;
-    end process;
-
- 
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            earlyR <= '0';
-        elsif rising_edge(i_clk) then
-            if state = MovingR then
-                if at_right_end = '0' and btR_sync = '1' then
-                    earlyR <= '1';
-                elsif at_right_end = '1' and ball_tick_edge='1' then
-                    earlyR <= '0';
-                end if;
-            else
-                earlyR <= '0';
-            end if;
-        end if;
-    end process;
-
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            earlyL <= '0';
-        elsif rising_edge(i_clk) then
-            if state = MovingL then
-                if at_left_end = '0' and btL_sync = '1' then
-                    earlyL <= '1';
-                elsif at_left_end = '1' and ball_tick_edge='1' then
-                    earlyL <= '0';
-                end if;
-            else
-                earlyL <= '0';
-            end if;
-        end if;
-    end process;
-
+    -- Main State Machine (Logic Fix Here)
     process(i_clk, i_rst)
     begin
         if i_rst='0' then
@@ -208,24 +120,28 @@ begin
         elsif rising_edge(i_clk) then
             case state is
                 when MovingR =>
-                    if ball_tick_edge='1' and at_right_end='1' then
-                        if earlyR='1' then
-                            state <= Lwin;             -- ´£«e«ö¡G¥ª³Ó
-                        elsif btR_sync='1' then
-                            state <= MovingL;          -- ·í©çÀ»¤¤¡G¤Ï¦V
+                    -- ææ—©æŒ‰ï¼ˆé‚„æ²’åˆ°çµ‚é»å°±æŒ‰éˆ•ï¼‰-> å·¦é‚Šè´
+                    if at_right_end = '0' and btR_sync = '1' then
+                        state <= Lwin;
+                    -- çƒç§»å‹•äº‹ä»¶
+                    elsif ball_tick_edge='1' and at_right_end='1' then
+                        if btR_sync='1' then
+                            state <= MovingL;          -- æˆåŠŸå›æ“Š
                         else
-                            state <= Lwin;             -- ºC«ö/¨S«ö¡G¥ª³Ó
+                            state <= Lwin;             -- æ²’æŒ‰æŒ‰éˆ•ï¼Œæ¼æ¥
                         end if;
                     end if;
 
                 when MovingL =>
-                    if ball_tick_edge='1' and at_left_end='1' then
-                        if earlyL='1' then
-                            state <= Rwin;
-                        elsif btL_sync='1' then
-                            state <= MovingR;
+                    -- ææ—©æŒ‰ï¼ˆé‚„æ²’åˆ°çµ‚é»å°±æŒ‰éˆ•ï¼‰-> å³é‚Šè´
+                    if at_left_end = '0' and btL_sync = '1' then
+                        state <= Rwin;
+                    -- çƒç§»å‹•äº‹ä»¶
+                    elsif ball_tick_edge='1' and at_left_end='1' then
+                        if btL_sync='1' then
+                            state <= MovingR;          -- æˆåŠŸå›æ“Š
                         else
-                            state <= Rwin;
+                            state <= Rwin;             -- æ²’æŒ‰æŒ‰éˆ•ï¼Œæ¼æ¥
                         end if;
                     end if;
 
@@ -245,6 +161,7 @@ begin
         end if;
     end process;
 
+    -- prev_state è¨˜éŒ„ç‹€æ…‹æ­·å²
     process(i_clk, i_rst)
     begin
         if i_rst='0' then
@@ -254,6 +171,7 @@ begin
         end if;
     end process;
 
+    -- Ball Speed Control
     process(i_clk, i_rst)
     begin
         if i_rst='0' then
@@ -271,6 +189,7 @@ begin
         end if;
     end process;
 
+    -- LED / Game Display Logic
     process(i_clk, i_rst)
     begin
         if i_rst='0' then
@@ -282,15 +201,15 @@ begin
                 led_r <= "0000" & scoreR;
             else
                 if (prev_state = Lwin and state = MovingR) then
-                    led_r <= "10000000";     -- ¥ªµo²y
+                    led_r <= "10000000";     -- Reset ball to Left
                 elsif (prev_state = Rwin and state = MovingL) then
-                    led_r <= "00000001";     -- ¥kµo²y
+                    led_r <= "00000001";     -- Reset ball to Right
                 else
                     if ball_tick_edge='1' then
                         if state = MovingR and at_right_end='0' then
-                            led_r <= '0' & led_r(7 downto 1);         -- ¥k²¾
+                            led_r <= '0' & led_r(7 downto 1);         -- Shift Right
                         elsif state = MovingL and at_left_end='0' then
-                            led_r <= led_r(6 downto 0) & '0';         -- ¥ª²¾
+                            led_r <= led_r(6 downto 0) & '0';         -- Shift Left
                         end if;
                     end if;
                 end if;
@@ -298,38 +217,13 @@ begin
         end if;
     end process;
 
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            L <= '0';
-        elsif rising_edge(i_clk) then
-            case state is
-                when MovingR => L <= '1';
-                when Lwin    => L <= '0';
-                when others  => null;
-            end case;
-        end if;
-    end process;
-
-    process(i_clk, i_rst)
-    begin
-        if i_rst='0' then
-            R <= '0';
-        elsif rising_edge(i_clk) then
-            case state is
-                when MovingL => R <= '1';
-                when Rwin    => R <= '0';
-                when others  => null;
-            end case;
-        end if;
-    end process;
-
+    -- Score Counters (æ”¹ç‚ºé€²å…¥æ–°ç‹€æ…‹æ™‚åŠ åˆ†ï¼Œç„¡è«–æ˜¯æ­£å¸¸missæˆ–ææ—©æ‰“)
     process(i_clk, i_rst)
     begin
         if i_rst='0' then
             scoreL <= "0000";
         elsif rising_edge(i_clk) then
-            if state = Lwin and L = '1' then
+            if state = Lwin and prev_state /= Lwin then
                 scoreL <= std_logic_vector(unsigned(scoreL) + 1);
             end if;
         end if;
@@ -340,12 +234,10 @@ begin
         if i_rst='0' then
             scoreR <= "0000";
         elsif rising_edge(i_clk) then
-            if state = Rwin and R = '1' then
+            if state = Rwin and prev_state /= Rwin then
                 scoreR <= std_logic_vector(unsigned(scoreR) + 1);
             end if;
         end if;
     end process;
 
 end Behavioral;
-
-
